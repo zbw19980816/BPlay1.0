@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/BPlay">
+        <file>Image/off.png</file>
+        <file>Image/on.png</file>
+        <file>Image/WindowIcon.png</file>
+        <file>Image/BPlay.png</file>
+    </qresource>
+</RCC>

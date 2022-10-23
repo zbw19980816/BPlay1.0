@@ -1,0 +1,13 @@
+---- AudioPts Matches (16 in 4 files) ----
+Baudio::run in Baudio.cpp :             Bffmpeg::GetInstance()->SetAudioPts(pkt.pts *
+Baudio::run in Baudio.cpp :            // BLOG("Bffmpeg::GetInstance()->GetAudioPts() %f", Bffmpeg::GetInstance()->GetAudioPts());
+Bffmpeg.cpp line 317 :  * double Bffmpeg::GetAudioPts()
+Bffmpeg.cpp line 320 : double Bffmpeg::GetAudioPts()
+Bffmpeg::GetAudioPts in Bffmpeg.cpp :     return this->AudioPts;
+Bffmpeg.cpp line 326 :  * double Bffmpeg::SetAudioPts()
+Bffmpeg.cpp line 329 : void Bffmpeg::SetAudioPts(double NewAudioPts)
+Bffmpeg::SetAudioPts in Bffmpeg.cpp :     this->AudioPts = NewAudioPts;
+Bffmpeg in Bffmpeg.h :     double GetAudioPts();                       /* 获取音频Pts */
+Bffmpeg in Bffmpeg.h :     void SetAudioPts(double NewAudioPts);       /* 更新音频Pts */
+Bffmpeg in Bffmpeg.h :     double AudioPts;                            /* 音频Pts */
+Bvideo::run in Bvideo.cpp :         if (pkt.pts * av_q2d(Bffmpeg::GetInstance()->GetFormatContext()->streams[Bffmpeg::GetInstance()->GetVideoIndex()]->time_base) > Bffmpeg::GetInstance()->GetAudioPts()) {

@@ -1,0 +1,10 @@
+release/Baudio.o
+release/Bbutton.o
+release/Bffmpeg.o
+release/Bpublic.o
+release/Bvideo.o
+release/Bwidget.o
+release/main.o
+release/mainwindow.o
+release/qrc_Image.o
+release/moc_mainwindow.o

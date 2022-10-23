@@ -1,0 +1,10 @@
+debug/Baudio.o
+debug/Bbutton.o
+debug/Bffmpeg.o
+debug/Bpublic.o
+debug/Bvideo.o
+debug/Bwidget.o
+debug/main.o
+debug/mainwindow.o
+debug/qrc_Image.o
+debug/moc_mainwindow.o
