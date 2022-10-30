@@ -132,9 +132,11 @@ int Bffmpeg::BLoadMediaFile(QString FilePath)
     BLOG("open codec success, width=%d,height=%d,TimeAll=%f\n",
             FormatContext->streams[Video_index]->codec->width, FormatContext->streams[Video_index]->codec->height, TimeAll);
 
-    Swr = swr_alloc();   //未释放？？？swr_free(&aCtx);
+    Swr = swr_alloc();
     AVCodecContext *AudioCodec = FormatContext->streams[Audio_index]->codec;
-    swr_alloc_set_opts(Swr, AudioCodec->channel_layout, AV_SAMPLE_FMT_S16, 44100,                                 /* 目标格式 */
+
+    /* 此处不对采样率进行重采样(尝试过将采样率统一成44100hz，但是在播放48000hz时会有杂音，原因未知) */
+    swr_alloc_set_opts(Swr, AudioCodec->channel_layout, AV_SAMPLE_FMT_S16, AudioCodec->sample_rate,               /* 目标格式 */
                            AudioCodec->channel_layout, AudioCodec->sample_fmt, AudioCodec->sample_rate, 0, 0);    /* 源格式 */
     swr_init(Swr);
 
@@ -172,8 +174,13 @@ void Bffmpeg::Reset()
 void Bffmpeg::ResetTime(int Time)
 {
     StopPlay();
-    Bffmpeg::GetInstance()->GetAudioQue().que.clear();
-    Bffmpeg::GetInstance()->GetVideoQue().que.clear();
+
+    {
+        /* 原子操作 */
+        QMutexLocker Locker(&Bffmpeg::GetInstance()->GetVideoQue().mtx);
+        Bffmpeg::GetInstance()->ClearVideoQue();
+        Bffmpeg::GetInstance()->ClearAudioQue();
+    }
 
     if (!FormatContext)
     {
@@ -185,31 +192,36 @@ void Bffmpeg::ResetTime(int Time)
     av_seek_frame(FormatContext, -1, (int64_t)Time * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD);
 
     /* 2、向后找播放点 */
-    AVPacket pkt;
-    int iFrame = 3;
+    AVPacket *pkt;
     while (1) {
-        av_read_frame(FormatContext, &pkt);
-        if (pkt.stream_index == Video_index) {
-            if (Time < pkt.pts * av_q2d(FormatContext->streams[Video_index]->time_base)) {
+        pkt = (AVPacket *)av_malloc(sizeof(AVPacket));
+        av_read_frame(FormatContext, pkt);
+        if (pkt->stream_index == Video_index) {
+            /* 解码 */
+            AVFrame* frame = Decode(pkt);
+            if (Time < pkt->pts * av_q2d(FormatContext->streams[Video_index]->time_base)) {
+                av_packet_unref(pkt);
+                av_packet_free(&pkt);
+                av_free(pkt);
+
+                /* 最后一帧解码帧数据入RGB队列，用于预览 */
+                QMutexLocker FrameLocker(&Bvideo::GetInstance()->GetFrameque().mtx);
+                Bvideo::GetInstance()->GetFrameque().frame.push_back(frame);
                 break;
             }
 
-            /* 解码 */
-            AVFrame* frame = Decode(&pkt);
-            av_packet_unref(&pkt);
-
-            /* 解码帧数据入RGB队列 */
-            //QMutexLocker FrameLocker(&Bvideo::GetInstance()->GetFrameque().mtx);
-
-           /* if (iFrame) {
-                iFrame = 0;
-                Bvideo::GetInstance()->GetFrameque().frame.push_back(frame);
-                //break;
-            }*/
+            av_frame_unref(frame);
+            av_frame_free(&frame);
         }
+
+        av_packet_unref(pkt);
+        av_packet_free(&pkt);
+        av_free(pkt);
     }
 
-    StartPlay();
+    /* 3、同步Pts */
+    AudioPts = Time;
+
     return;
 }
 
@@ -264,29 +276,26 @@ void Bffmpeg::start()
 void Bffmpeg::run()
 {
     int Ret = 0;
-    AVPacket pkt;
+    AVPacket *pkt;
 
     while (ffmpegrun) {
-        //BLOG("run AudioQue.que.size() %d    VideoQue.que.size() %d", AudioQue.que.size(), VideoQue.que.size());
         if (AudioQue.que.size() > 10 || VideoQue.que.size() > 10) {
-            //BLOG("run %d", ++c);
             msleep(1);
             continue;
         }
 
-        memset(&pkt , 0, sizeof(pkt));
-        Ret = av_read_frame(FormatContext, &pkt);
-        //BLOG("av_read_frame Ret:%d  pkt.stream_index:%d", Ret, pkt.stream_index);
+        pkt = (AVPacket *)av_malloc(sizeof(AVPacket));
+        Ret = av_read_frame(FormatContext, pkt);
         if (0 != Ret) {
             BLOG("av_read_frame fail, Ret[%d]", Ret);
             return;
         }
 
-        if (pkt.stream_index == Audio_index) {
+        if (pkt->stream_index == Audio_index) {
             /* 音频流入队列 */
             QMutexLocker locker(&AudioQue.mtx);
             AudioQue.que.push_back(pkt);
-        } else if (pkt.stream_index == Video_index) {
+        } else if (pkt->stream_index == Video_index) {
             /* 视频流入队列 */
             QMutexLocker locker(&VideoQue.mtx);
             VideoQue.que.push_back(pkt);
@@ -308,12 +317,46 @@ BQueue& Bffmpeg::GetVideoQue()
 }
 
 /********************************
+ * void Bffmpeg::ClearVideoQue()
+ * 功能：清空视频流队列
+ * *****************************/
+void Bffmpeg::ClearVideoQue()
+{
+    while (VideoQue.que.size() != 0) {
+        AVPacket *pkt = VideoQue.que.front();
+        av_packet_unref(pkt);
+        av_packet_free(&pkt);
+        av_free(pkt);
+        VideoQue.que.pop_front();
+    }
+
+    return;
+}
+
+/********************************
  * BQueue Bffmpeg::GetAudioQue()
  * 功能：获取音频流队列
  * *****************************/
 BQueue& Bffmpeg::GetAudioQue()
 {
     return this->AudioQue;
+}
+
+/********************************
+ * void Bffmpeg::ClearAudioQue()
+ * 功能：清空音频流队列
+ * *****************************/
+void Bffmpeg::ClearAudioQue()
+{
+    while (AudioQue.que.size() != 0) {
+        AVPacket *pkt = AudioQue.que.front();
+        av_packet_unref(pkt);
+        av_packet_free(&pkt);
+        av_free(pkt);
+        AudioQue.que.pop_front();
+    }
+
+    return;
 }
 
 /********************************

@@ -76,6 +76,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             int value = QStyle::sliderValueFromPosition(ui->BPlaySlider->minimum(), ui->BPlaySlider->maximum(), mouseEvent->pos().x(), ui->BPlaySlider->width());
             ui->BPlaySlider->setValue(value);
             Bffmpeg::GetInstance()->ResetTime(ui->BPlaySlider->value());
+            if (OnOffBbutton->GetButtonStatus()) {
+                Bffmpeg::GetInstance()->StartPlay();
+            }
         }
     }
     
@@ -109,6 +112,10 @@ void MainWindow::on_BPlaySlider_sliderReleased()
 {
     BPlaySliderPress = false;
     Bffmpeg::GetInstance()->ResetTime(ui->BPlaySlider->value());
+    if (OnOffBbutton->GetButtonStatus()) {
+        Bffmpeg::GetInstance()->StartPlay();
+    }
+
     return;
 }
 

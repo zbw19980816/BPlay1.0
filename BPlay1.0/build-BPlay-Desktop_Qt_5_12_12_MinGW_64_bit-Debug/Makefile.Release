@@ -19,7 +19,7 @@ CXXFLAGS      = -fno-keep-inline-dllexport -O2 -std=gnu++11 -Wall -W -Wextra -fe
 INCPATH       = -I..\BPlay -I. -I..\BPlay\ffmpeg\include -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include\QtWidgets -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include\QtMultimedia -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include\QtGui -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include\QtANGLE -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include\QtNetwork -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\include\QtCore -Irelease -I. -I/include -IC:\Qt\Qt5.12.12\5.12.12\mingw73_64\mkspecs\win32-g++ 
 LINKER      =        g++
 LFLAGS        =        -Wl,-s -Wl,-subsystem,windows -mthreads
-LIBS        =        -LC:\Users\14142\Desktop\1001\BPlay\BPlay\ffmpeg\lib -lavcodec -lavformat -lswscale -lavutil -lswresample C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Widgets.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Multimedia.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Gui.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Network.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Core.a  -lmingw32 C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libqtmain.a -LC:\openssl\lib -LC:\Utils\my_sql\mysql-5.6.11-winx64\lib -LC:\Utils\postgresql\pgsql\lib -lshell32 
+LIBS        =        -LC:\Users\14142\Desktop\BPlay1.0\BPlay1.0\BPlay1.0\BPlay\ffmpeg\lib -lavcodec -lavformat -lswscale -lavutil -lswresample C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Widgets.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Multimedia.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Gui.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Network.a C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libQt5Core.a  -lmingw32 C:\Qt\Qt5.12.12\5.12.12\mingw73_64\lib\libqtmain.a -LC:\openssl\lib -LC:\Utils\my_sql\mysql-5.6.11-winx64\lib -LC:\Utils\postgresql\pgsql\lib -lshell32 
 QMAKE         = C:\Qt\Qt5.12.12\5.12.12\mingw73_64\bin\qmake.exe
 IDC           = idc
 IDL           = midl
@@ -125,8 +125,10 @@ compiler_rcc_clean:
 	-$(DEL_FILE) release\qrc_Image.cpp
 release/qrc_Image.cpp: ../BPlay/Image.qrc \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/bin/rcc.exe \
+		../BPlay/Image/BPlay.png \
 		../BPlay/Image/on.png \
-		../BPlay/Image/off.png
+		../BPlay/Image/off.png \
+		../BPlay/Image/WindowIcon.png
 	C:\Qt\Qt5.12.12\5.12.12\mingw73_64\bin\rcc.exe -name Image ..\BPlay\Image.qrc -o release\qrc_Image.cpp
 
 compiler_moc_predefs_make_all: release/moc_predefs.h
@@ -315,7 +317,7 @@ release/moc_mainwindow.cpp: ../BPlay/mainwindow.h \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/QMouseEvent \
 		release/moc_predefs.h \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/bin/moc.exe
-	C:\Qt\Qt5.12.12\5.12.12\mingw73_64\bin\moc.exe $(DEFINES) --include C:/Users/14142/Desktop/1001/BPlay/build-BPlay-Desktop_Qt_5_12_12_MinGW_64_bit-Debug/release/moc_predefs.h -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/mkspecs/win32-g++ -IC:/Users/14142/Desktop/1001/BPlay/BPlay -IC:/Users/14142/Desktop/1001/BPlay/BPlay/ffmpeg/include -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtMultimedia -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtNetwork -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore -I. -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IC:/Qt/Qt5.12.12/Tools/mingw730_64/x86_64-w64-mingw32/include ..\BPlay\mainwindow.h -o release\moc_mainwindow.cpp
+	C:\Qt\Qt5.12.12\5.12.12\mingw73_64\bin\moc.exe $(DEFINES) --include C:/Users/14142/Desktop/BPlay1.0/BPlay1.0/BPlay1.0/build-BPlay-Desktop_Qt_5_12_12_MinGW_64_bit-Debug/release/moc_predefs.h -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/mkspecs/win32-g++ -IC:/Users/14142/Desktop/BPlay1.0/BPlay1.0/BPlay1.0/BPlay -IC:/Users/14142/Desktop/BPlay1.0/BPlay1.0/BPlay1.0/BPlay/ffmpeg/include -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtMultimedia -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtNetwork -IC:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore -I. -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IC:/Qt/Qt5.12.12/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IC:/Qt/Qt5.12.12/Tools/mingw730_64/x86_64-w64-mingw32/include ..\BPlay\mainwindow.h -o release\moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1599,44 +1601,6 @@ release/mainwindow.o: ../BPlay/mainwindow.cpp ../BPlay/mainwindow.h \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qstyle.h \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/QMouseEvent \
 		ui_mainwindow.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore/QVariant \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QApplication \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qapplication.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore/qcoreapplication.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore/qeventloop.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qdesktopwidget.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qguiapplication.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qinputmethod.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QLabel \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qlabel.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qframe.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QMenuBar \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qmenubar.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qmenu.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qaction.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qactiongroup.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QSlider \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qslider.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qabstractslider.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QWidget \
-		../BPlay/bwidget.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QOpenGLWidget \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qopenglwidget.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/QSurfaceFormat \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qsurfaceformat.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qopengl.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore/qt_windows.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE/GLES3/gl3.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE/GLES3/gl3platform.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE/KHR/khrplatform.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE/GLES2/gl2.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtANGLE/GLES2/gl2platform.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qopengles2ext.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qopenglext.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/QPainter \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qpainter.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qtextoption.h \
-		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtGui/qpen.h \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/QFileDialog \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtWidgets/qfiledialog.h \
 		C:/Qt/Qt5.12.12/5.12.12/mingw73_64/include/QtCore/qdir.h \

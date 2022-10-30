@@ -27,7 +27,7 @@ extern "C" {
 }
 
 typedef struct {
-    QQueue<AVPacket> que;
+    QQueue<AVPacket *> que;
     QMutex mtx;
 } BQueue;
 
@@ -50,7 +50,9 @@ public:
     void Reset();                               /* 释放上一个媒体的所有资源 */
     double GetTimeAll();                        /* 获取视频总时长 */
     void ResetTime(int Time);                   /* 重设视频播放时间(进度) */
-    
+    void ClearAudioQue();                       /* 清空音频流队列 */
+    void ClearVideoQue();                       /* 清空视频流队列 */
+
 private:
     Bffmpeg();                                  /* Bffmpeg构造 */
     void run();                                 /* 音视频主控线程 */

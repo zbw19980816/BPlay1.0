@@ -52,7 +52,7 @@ void Bbutton::mouseReleaseEvent(QMouseEvent *e)
 
     /* 联动视频开启/暂停 */
     LinkFfmpeg();
-    
+
     return;
 }
 
@@ -69,6 +69,15 @@ void Bbutton::LinkFfmpeg()
     }
     
     return;
+}
+
+/********************************
+ * bool Bbutton::GetButtonStatus()
+ * 功能：获取按钮状态
+ * *****************************/
+bool Bbutton::GetButtonStatus()
+{
+    return Status;
 }
 
 /********************************

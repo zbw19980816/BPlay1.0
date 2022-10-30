@@ -38,7 +38,7 @@ Baudio* Baudio::GetInstance()
 void Baudio::OpenAudioOutput()
 {
     QAudioFormat  fmt;                            // 设置音频输出格式
-    fmt.setSampleRate(44100);                     // 1秒的音频采样率
+    fmt.setSampleRate(Bffmpeg::GetInstance()->GetFormatContext()->streams[Bffmpeg::GetInstance()->GetAudioIndex()]->codec->sample_rate);                // 1秒的音频采样率
     fmt.setSampleSize(16);                        // 声音样本的大小
     fmt.setChannelCount(Bffmpeg::GetInstance()->GetFormatContext()->streams[Bffmpeg::GetInstance()->GetAudioIndex()]->codec->channels);                 // 声道
     fmt.setCodec("audio/pcm");                    // 解码格式
@@ -99,9 +99,9 @@ void Baudio::run()
 
     while (audiorun)
     {
-        AVPacket pkt;
-        memset(&pkt , 0, sizeof(pkt));
-
+        AVPacket *pkt;
+        AVFrame* frame;
+        
         if ((Bffmpeg::GetInstance()->GetAudioQue().que.size() == 0) || (output->bytesFree() < output->periodSize())) {
             msleep(1);
             continue;
@@ -109,21 +109,22 @@ void Baudio::run()
             /* 音频流编码数据出队列 */
             QMutexLocker Locker(&Bffmpeg::GetInstance()->GetAudioQue().mtx);
             pkt = Bffmpeg::GetInstance()->GetAudioQue().que.front();
-            Bffmpeg::GetInstance()->GetAudioQue().que.pop_front();
 
             /* 更新音频播放时间 */
-            Bffmpeg::GetInstance()->SetAudioPts(pkt.pts *
+            Bffmpeg::GetInstance()->SetAudioPts(pkt->pts *
                     av_q2d(Bffmpeg::GetInstance()->GetFormatContext()->streams[Bffmpeg::GetInstance()->GetAudioIndex()]->time_base));
+            
+            /* 解码 */
+            frame = Bffmpeg::GetInstance()->Decode(pkt);
+            av_packet_unref(pkt); 
+            av_packet_free(&pkt);
+            av_free(pkt);
+            Bffmpeg::GetInstance()->GetAudioQue().que.pop_front();
+            if (frame == NULL) {
+                continue;
+            }
         }
         
-        
-        /* 解码 */
-        AVFrame* frame = Bffmpeg::GetInstance()->Decode(&pkt);
-        av_packet_unref(&pkt); 
-        if (frame == NULL) {
-            continue;
-        }
-
         /* 音频重采样 */
         AVFormatContext *FormatContext = Bffmpeg::GetInstance()->GetFormatContext();
         AVCodecContext *CodecContext = FormatContext->streams[Bffmpeg::GetInstance()->GetAudioIndex()]->codec;

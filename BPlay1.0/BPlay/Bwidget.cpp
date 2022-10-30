@@ -65,6 +65,8 @@ void Bwidget::paintEvent(QPaintEvent *event)
               linesize);                    /* 每个通道行字节数 */
 
     /* 释放解码数据，出队列 */
+    sws_freeContext(context);
+    av_frame_unref(frame);
     av_frame_free(&frame);
     Bvideo::GetInstance()->GetFrameque().frame.pop_front();
 

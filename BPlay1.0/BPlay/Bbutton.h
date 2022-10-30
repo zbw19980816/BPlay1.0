@@ -15,6 +15,7 @@ class Bbutton : public QPushButton
 {
 public:
     Bbutton(QString Image1, QString Image2);
+    bool GetButtonStatus();                     /* 获取按钮状态 */
     void SetButtonStatus(bool status);          /* 设置按钮状态 */
     void LinkFfmpeg();
 private:

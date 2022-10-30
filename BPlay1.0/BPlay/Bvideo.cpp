@@ -40,28 +40,32 @@ void Bvideo::run()
 {
     while (videorun)
     {
-        if (Bffmpeg::GetInstance()->GetVideoQue().que.size() == 0) {
-            msleep(1);
-            continue;
-        }
-
-        AVPacket pkt = Bffmpeg::GetInstance()->GetVideoQue().que.front();
-        if (pkt.pts * av_q2d(Bffmpeg::GetInstance()->GetFormatContext()->streams[Bffmpeg::GetInstance()->GetVideoIndex()]->time_base) > Bffmpeg::GetInstance()->GetAudioPts()) {
-            msleep(1);
-            continue;
-        } else {
-            /* 视频流编码数据出队列 */
+        AVFrame* frame;
+        
+        {
             QMutexLocker Locker(&Bffmpeg::GetInstance()->GetVideoQue().mtx);
-            Bffmpeg::GetInstance()->GetVideoQue().que.pop_front();
+            if (Bffmpeg::GetInstance()->GetVideoQue().que.size() == 0) {
+                msleep(1);
+                continue;
+            }
+
+            AVPacket *pkt = Bffmpeg::GetInstance()->GetVideoQue().que.front();
+            if (pkt->pts * av_q2d(Bffmpeg::GetInstance()->GetFormatContext()->streams[Bffmpeg::GetInstance()->GetVideoIndex()]->time_base) > Bffmpeg::GetInstance()->GetAudioPts()) {
+                msleep(1);
+                continue;
+            } else {
+                /* 视频流编码数据出队列+解码 */
+                frame = Bffmpeg::GetInstance()->Decode(pkt);
+                av_packet_unref(pkt); 
+                av_packet_free(&pkt);
+                av_free(pkt);
+                Bffmpeg::GetInstance()->GetVideoQue().que.pop_front();
+                if (frame == NULL) {
+                    continue;
+                }
+            }
         }
 
-        /* 解码 */
-        AVFrame* frame = Bffmpeg::GetInstance()->Decode(&pkt);
-        av_packet_unref(&pkt); 
-        if (frame == NULL) {
-            continue;
-        }
-        //continue;
         /* 解码帧数据入RGB队列 */
         QMutexLocker FrameLocker(&frameque.mtx);
         frameque.frame.push_back(frame);
